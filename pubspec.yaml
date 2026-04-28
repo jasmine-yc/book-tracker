@@ -39,18 +39,6 @@ flutter:
   uses-material-design: true
   assets:
     - assets/icon/
-  fonts:
-    - family: Noto Serif TC #這裡填字體家族名稱
-      fonts:
-        - asset: fonts/NotoSerifTC-Black.ttf
-        - asset: fonts/NotoSerifTC-Bold.ttf
-        - asset: fonts/NotoSerifTC-ExtraBold.ttf
-        - asset: fonts/NotoSerifTC-ExtraLight.ttf
-        - asset: fonts/NotoSerifTC-Light.ttf
-        - asset: fonts/NotoSerifTC-Medium.ttf
-        - asset: fonts/NotoSerifTC-Regular.ttf
-        - asset: fonts/NotoSerifTC-SemiBold.ttf
-        - asset: fonts/NotoSerifTC-VariableFont_wght.ttf
 flutter_launcher_icons:
   android: true
   ios: true
