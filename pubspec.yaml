@@ -1,0 +1,59 @@
+name: book_app
+description: "A new Flutter project."
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.8.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  path_provider: ^2.1.2
+  cupertino_icons: ^1.0.8
+  uuid: ^4.3.3
+  image_picker: ^1.0.7
+  image_picker_for_web: ^3.0.0
+  path: ^1.8.3
+  flutter_chips_input: ^2.0.0
+  flutter_typeahead: ^5.2.0
+  flutter_chip_tags: ^2.0.2
+  tagged_field: ^1.0.3
+  flutter_riverpod: ^2.5.0
+  iconify_flutter: ^0.0.7
+  multi_select_flutter: ^4.1.3
+  google_fonts: ^8.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  hive_generator: ^2.0.1
+  build_runner: ^2.4.6
+  flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/icon/
+  fonts:
+    - family: Noto Serif TC #這裡填字體家族名稱
+      fonts:
+        - asset: fonts/NotoSerifTC-Black.ttf
+        - asset: fonts/NotoSerifTC-Bold.ttf
+        - asset: fonts/NotoSerifTC-ExtraBold.ttf
+        - asset: fonts/NotoSerifTC-ExtraLight.ttf
+        - asset: fonts/NotoSerifTC-Light.ttf
+        - asset: fonts/NotoSerifTC-Medium.ttf
+        - asset: fonts/NotoSerifTC-Regular.ttf
+        - asset: fonts/NotoSerifTC-SemiBold.ttf
+        - asset: fonts/NotoSerifTC-VariableFont_wght.ttf
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/icon.png" # 你的圖標路徑
+  min_sdk_android: 21 # 可選，設置 Android 最低 SDK
+
