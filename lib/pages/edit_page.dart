@@ -53,10 +53,8 @@ class _EditPageState extends ConsumerState<EditPage>
         ref
             .read(selectedTagsProvider.notifier)
             .setTags(widget.book!.tags ?? []);
-      }else{
-        ref
-          .read(selectedTagsProvider.notifier)
-          .setTags([]);
+      } else {
+        ref.read(selectedTagsProvider.notifier).setTags([]);
       }
     });
   }
@@ -77,7 +75,7 @@ class _EditPageState extends ConsumerState<EditPage>
 
     final selectedNotifier = ref.read(selectedTagsProvider.notifier);
     final selectedTags = ref.read(selectedTagsProvider);
-    final allTagsNotifier= ref.read(allTagsProvider.notifier);
+    final allTagsNotifier = ref.read(allTagsProvider.notifier);
 
     if (!selectedTags.contains(text)) {
       selectedNotifier.addTag(text);
@@ -93,7 +91,7 @@ class _EditPageState extends ConsumerState<EditPage>
 
   // 儲存書籍並回傳結果
   Future<void> saveBook() async {
-    print("🔥 saveBook 有被呼叫");
+    print("saveBook 有被呼叫");
     // 收起鍵盤
     FocusScope.of(context).unfocus();
     final tags = ref.read(selectedTagsProvider);
@@ -148,13 +146,14 @@ class _EditPageState extends ConsumerState<EditPage>
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 41, 43, 42),
+        backgroundColor: const Color.fromARGB(255, 95, 113, 139),
         title: Text(
           widget.book == null ? "新增書籍" : widget.book!.title,
-          style: TextStyle(color: Colors.white54),
+          style: TextStyle(color: Colors.white70),
+          // Colors.white54
         ),
         bottom: TabBar(
-          unselectedLabelColor: Colors.white38,
+          unselectedLabelColor: Colors.white60,
           labelColor: Colors.grey[100],
           indicatorColor: Colors.grey[100],
           controller: _tabController,
@@ -215,10 +214,12 @@ class _EditPageState extends ConsumerState<EditPage>
                     SizedBox(height: 24),
                     Wrap(
                       spacing: 8,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
-                        Text('閱讀狀態 (預設未讀)', style: TextStyle(fontSize: 16.0)),
+                        Text('閱讀狀態：', style: TextStyle(fontSize: 16.0)),
                         ChoiceChip(
                           label: Text('未讀'),
+                          showCheckmark: false,
                           selected: _status == BookStatus.unRead,
                           onSelected: (_) {
                             setState(() {
@@ -228,6 +229,7 @@ class _EditPageState extends ConsumerState<EditPage>
                         ),
                         ChoiceChip(
                           label: Text('閱讀中'),
+                          showCheckmark: false,
                           selected: _status == BookStatus.reading,
                           onSelected: (_) {
                             setState(() {
@@ -237,6 +239,7 @@ class _EditPageState extends ConsumerState<EditPage>
                         ),
                         ChoiceChip(
                           label: Text('完讀'),
+                          showCheckmark: false,
                           selected: _status == BookStatus.finished,
                           onSelected: (_) {
                             setState(() {
@@ -280,7 +283,9 @@ class _EditPageState extends ConsumerState<EditPage>
                         return Wrap(
                           spacing: 4,
                           runSpacing: 4,
+                          crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
+                            Text('標籤：', style:TextStyle(fontSize:16.0)),
                             // 已選標籤
                             ...selectedTags.map(
                               (tag) => Chip(
@@ -290,6 +295,7 @@ class _EditPageState extends ConsumerState<EditPage>
                                 onDeleted: () => _removeTag(tag),
                               ),
                             ),
+
                             // 輸入框
                             SizedBox(
                               width: 120,
@@ -311,29 +317,40 @@ class _EditPageState extends ConsumerState<EditPage>
                       },
                     ),
                     SizedBox(height: 12),
-                    Container(  
-                      decoration:BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                        color: Colors.white54,
-                      ),
-                      child: Wrap(
-                        spacing: 5,
-                        children: List.generate(5, (index) {
-                          return IconButton(
-                            padding: EdgeInsets.all(1),
-                            constraints: BoxConstraints(),
-                            icon: Icon(
-                              index < rate ? Icons.star : Icons.star_border,
-                              color: Colors.amber,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                rate = index + 1;
-                              });
-                            },
-                          );
-                        }),
-                      ),
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 8,
+                      children: [
+                        Text('評分：', style: TextStyle(fontSize: 16)),
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                            color: Colors.white54,
+                          ),
+                          padding: EdgeInsets.symmetric(
+                            vertical: 2,
+                            horizontal: 10,
+                          ),
+                          child: Wrap(
+                            spacing: 5,
+                            children: List.generate(5, (index) {
+                              return IconButton(
+                                padding: EdgeInsets.all(1),
+                                constraints: BoxConstraints(),
+                                icon: Icon(
+                                  index < rate ? Icons.star : Icons.star_border,
+                                  color: Color.fromARGB(255, 95, 113, 139),
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    rate = index + 1;
+                                  });
+                                },
+                              );
+                            }),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -359,12 +376,12 @@ class _EditPageState extends ConsumerState<EditPage>
         // TAB 1
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Color.fromARGB(255, 218, 235, 222),
+        //backgroundColor: Color.fromARGB(255, 218, 229, 235),
         onPressed: () {
           saveBook();
           print('save button pressed');
         },
-        child: const Icon(Icons.save, color: Color.fromARGB(255, 96, 132, 98),),
+        child: const Icon(Icons.save),
       ),
     );
   }

@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
       home:LibraryPage(),
       color: Colors.grey[850],
       theme:ThemeData(
-        colorSchemeSeed: Colors.black,
+        colorSchemeSeed: Color.fromARGB(255, 95, 113, 139),
         textTheme: GoogleFonts.notoSerifTcTextTheme(),
       )
     );

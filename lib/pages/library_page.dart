@@ -90,18 +90,18 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     return Scaffold(
       backgroundColor: Colors.grey[100],
 
-      // appBar: AppBar(
-      //   leading: Image.asset("assets/icon/app_icon.jpg"),
-      //   backgroundColor: Color.fromARGB(255, 218, 235, 222),
-      //   centerTitle: true,
-      //   title: const Text(
-      //     '記下看過的書',
-      //     style: TextStyle(
-      //       color: Color.fromARGB(255, 28, 35, 32),
-      //       letterSpacing: 4,
-      //     ),
-      //   ),
-      // ),
+      appBar: AppBar(
+        leading: Image.asset("assets/icon/app_icon.jpg"),
+        backgroundColor: Color.fromARGB(255, 95, 113, 139),
+        centerTitle: true,
+        title: const Text(
+          '記下看過的書',
+          style: TextStyle(
+            color: Colors.white,
+            letterSpacing: 4,
+          ),
+        ),
+      ),
       body: Column(
         children: [
           // 搜尋框
@@ -275,7 +275,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       ),
       // 新增書本懸浮紐 自動建立空資料
       floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color.fromARGB(255, 96, 132, 98),
+        backgroundColor: const Color.fromARGB(255, 77, 77, 79),
         onPressed: () async {
           // 導航到編輯頁面
           navigateToEditPage(context);
