@@ -21,8 +21,11 @@ class DetailPage extends StatelessWidget {
           child: Scaffold(
             backgroundColor: Colors.grey[50],
             appBar: AppBar(
-              title: Text('檢視書籍', style:TextStyle(color:Color.fromARGB(255, 28, 35, 32),)),
-              backgroundColor: Color.fromARGB(255, 218, 235, 222),
+              title: Text(
+                '檢視書籍',
+                style: TextStyle(color: Colors.white70),
+              ),
+              backgroundColor: const Color.fromARGB(255, 150, 123, 182),
               actions: [
                 IconButton(
                   icon: Icon(Icons.delete),
@@ -56,7 +59,10 @@ class DetailPage extends StatelessWidget {
                   },
                 ),
               ],
-              bottom: const TabBar(
+              bottom: TabBar(
+                unselectedLabelColor: Colors.white60,
+                labelColor: Colors.grey[100],
+                indicatorColor: Colors.grey[100],
                 tabs: [
                   Tab(text: 'INFO'),
                   Tab(text: 'NOTE'),
@@ -97,16 +103,22 @@ class DetailPage extends StatelessWidget {
                       Text(
                         updatedBook.title,
                         style: const TextStyle(
-                          fontSize: 20,
+                          fontSize: 25,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Row(
                         children: [
-                          const Text("作者：", style: TextStyle(fontSize: 18)),
+                          Icon(Icons.portrait),
+                          const Text(
+                            "作者：",
+                            maxLines: 1,
+                            style: TextStyle(fontSize: 18),
+                          ),
                           Text(
                             updatedBook.author,
+                            maxLines: 1,
                             style: const TextStyle(
                               fontSize: 18,
                               color: Color.fromARGB(255, 255, 0, 102),
@@ -178,11 +190,13 @@ class DetailPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Row(
-                        children:[
-                          Text('狀態：${book.status}', style: TextStyle(fontSize: 18)),
-
-                        ]
-                      )
+                        children: [
+                          Text(
+                            '狀態：${book.status}',
+                            style: TextStyle(fontSize: 18),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -197,10 +211,7 @@ class DetailPage extends StatelessWidget {
                       //const SizedBox(height: 8),
                       SelectableText(
                         updatedBook.note,
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.teal[800],
-                        ),
+                        style: TextStyle(fontSize: 18, color: Colors.teal[800]),
                       ),
                     ],
                   ),
@@ -208,7 +219,7 @@ class DetailPage extends StatelessWidget {
               ],
             ),
             floatingActionButton: FloatingActionButton(
-              backgroundColor: const Color.fromARGB(255, 79, 122, 95),
+              backgroundColor: Color.fromARGB(255,150,123,182),
               tooltip: '編輯',
               child: const Icon(Icons.edit, color: Colors.white),
               onPressed: () async {

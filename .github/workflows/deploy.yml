@@ -1,0 +1,39 @@
+name: Deploy Flutter Web
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 下載 repo
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 安裝 Flutter
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.24.0
+
+      # 安裝套件
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Build Flutter Web
+      - name: Build web
+        run: flutter build web --release --base-href /${{ github.event.repository.name }}/
+
+      # Deploy 到 gh-pages
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/web

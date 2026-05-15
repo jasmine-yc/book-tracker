@@ -8,7 +8,6 @@ import '../models/book_data.dart';
 import '../pages/edit_page.dart';
 
 // widgets
-import '../widgets/sort_button.dart';
 import '../widgets/book_card.dart';
 // providers
 import '../providers/book_provider.dart';
@@ -26,6 +25,39 @@ class LibraryPage extends ConsumerStatefulWidget {
 
 class _LibraryPageState extends ConsumerState<LibraryPage> {
   late final TextEditingController searchController;
+
+  Future<void> navigateToEditPage(BuildContext context, {Book? book}) async {
+    final result = await Navigator.push<Map<String, dynamic>>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditPage(book: book, bookKey: book?.key),
+      ),
+    );
+
+    // 保護：使用者按返回沒儲存
+    if (result == null || result['book'] == null) {
+      return;
+    }
+
+    final newBook = result['book'] as Book;
+    final isNew = result['isNew'] as bool? ?? true; //防呆
+
+    if (isNew) {
+      // 新增
+      ref.read(bookProvider.notifier).addBook(book: newBook);
+    } else {
+      // 編輯
+      ref.read(bookProvider.notifier).updateBook(book: newBook);
+    }
+    if (!context.mounted) return;
+
+    ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+      SnackBar(
+        content: Text(isNew ? "新增成功" : "編輯儲存成功"),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -52,61 +84,25 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
 
     // TODO: 根據 SortButton 狀態做排序（可再加一個 sortProvider）
 
-    //導航到新增頁
-    Future<void> navigateToEditPage(BuildContext context, {Book? book}) async {
-      final result = await Navigator.push<Map<String, dynamic>>(
-        context,
-        MaterialPageRoute(
-          builder: (context) => EditPage(book: book, bookKey: book?.key),
-        ),
-      );
-
-      // 保護：使用者按返回沒儲存
-      if (result == null || result['book'] == null) {
-        return;
-      }
-
-      final newBook = result['book'] as Book;
-      final isNew = result['isNew'] as bool? ?? true; //防呆
-
-      if (isNew) {
-        // 新增
-        ref.read(bookProvider.notifier).addBook(book: newBook);
-      } else {
-        // 編輯
-        ref.read(bookProvider.notifier).updateBook(book: newBook);
-      }
-      if (!context.mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(isNew ? "新增成功" : "編輯儲存成功"),
-          duration: const Duration(seconds: 2),
-        ),
-      );
-    }
-
     // -----------------------------------------------------
     return Scaffold(
-      backgroundColor: Colors.grey[100],
-
+      backgroundColor: Colors.grey[50], // 淺灰
       appBar: AppBar(
         leading: Image.asset("assets/icon/app_icon.jpg"),
-        backgroundColor: Color.fromARGB(255, 95, 113, 139),
+        // backgroundColor: Color.fromARGB(255, 176, 196, 222), // LightSteelBlue
+        // backgroundColor: Color.fromARGB(255, 61, 93, 133),
+        backgroundColor: Color.fromARGB(255, 150, 123, 182), // 紫羅蘭色
         centerTitle: true,
         title: const Text(
-          '記下看過的書',
-          style: TextStyle(
-            color: Colors.white,
-            letterSpacing: 4,
-          ),
+          'BOOK TRACKER',
+          style: TextStyle(color: Colors.white, letterSpacing: 4),
         ),
       ),
       body: Column(
         children: [
           // 搜尋框
           Padding(
-            padding: EdgeInsetsGeometry.fromLTRB(8.0, 16.0, 8.0, 0.0),
+            padding: EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 0.0),
             child: TypeAheadField<String>(
               controller: searchController,
               suggestionsCallback: (pattern) {
@@ -138,7 +134,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                   controller: controller,
                   focusNode: focusNode,
                   decoration: InputDecoration(
-                    hintText: '搜尋 (書名/作者)',
+                    hintText: 'Search by book title or author',
                     // suffixText: '<10字',
                     filled: true,
                     fillColor: Colors.white,
@@ -155,7 +151,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(20.0)),
                       borderSide: BorderSide(
-                        color: const Color.fromARGB(255, 9, 8, 8),
+                        color: const Color.fromARGB(255, 120, 133, 164),
                       ),
                     ),
                   ),
@@ -174,9 +170,10 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
               },
             ),
           ),
+
           // 標籤搜尋
           Padding(
-            padding: EdgeInsetsGeometry.fromLTRB(8.0, 4.0, 8.0, 0.0),
+            padding: EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 0.0),
             child: TypeAheadField<String>(
               suggestionsCallback: (pattern) {
                 final results = allTags
@@ -232,13 +229,41 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                SortButton(text: "新增在最上面"),
-                SizedBox(width: 8.0),
-                SortButton(text: "新增在最下面"),
-                SizedBox(width: 8.0),
-                SortButton(text: "自訂順序"),
+                TextButton(
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (context) {
+                        return StatefulBuilder(
+                          builder: (context, setModalState) {
+                            return ListView(
+                              children: allTags.map((tag) {
+                                return CheckboxListTile(
+                                  title: Text(tag),
+                                  value: selectedTags.contains(tag),
+                                  onChanged: (selected) {
+                                    setModalState(() {
+                                      if (selected == true) {
+                                        selectedTags.add(tag);
+                                      } else {
+                                        selectedTags.remove(tag);
+                                      }
+                                    });
+                                  },
+                                  controlAffinity:
+                                      ListTileControlAffinity.leading,
+                                );
+                              }).toList(),
+                            );
+                          },
+                        );
+                      },
+                    );
+                  },
+                  child: Text('標籤篩選'),
+                ),
               ],
             ),
           ),
@@ -252,18 +277,22 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                   if (books.isEmpty) {
                     return const Center(
                       child: Text(
-                        '你的書櫃空空如也，請按加號新增書籍哦',
+                        '你的書櫃目前什麼都沒有哦！',
                         style: TextStyle(fontSize: 18),
                       ),
                     );
                   }
 
-                  // 可滑動清單列
+                  if (filteredBooks.isEmpty) {
+                    return const Center(
+                      child: Text('無搜尋結果', style: TextStyle(fontSize: 18)),
+                    );
+                  }
+
                   return ListView.builder(
                     itemCount: filteredBooks.length,
                     itemBuilder: (context, index) {
                       final book = filteredBooks[index];
-                      print('顯示第 $index 本： ${book.title} - key: ${book.key}');
                       return BookCard(book: book);
                     },
                   );
@@ -275,7 +304,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       ),
       // 新增書本懸浮紐 自動建立空資料
       floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color.fromARGB(255, 77, 77, 79),
+        backgroundColor: const Color.fromARGB(255, 150, 123, 182),
         onPressed: () async {
           // 導航到編輯頁面
           navigateToEditPage(context);

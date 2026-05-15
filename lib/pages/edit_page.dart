@@ -146,7 +146,7 @@ class _EditPageState extends ConsumerState<EditPage>
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 95, 113, 139),
+        backgroundColor: const Color.fromARGB(255,150,123,182),
         title: Text(
           widget.book == null ? "新增書籍" : widget.book!.title,
           style: TextStyle(color: Colors.white70),
@@ -339,7 +339,7 @@ class _EditPageState extends ConsumerState<EditPage>
                                 constraints: BoxConstraints(),
                                 icon: Icon(
                                   index < rate ? Icons.star : Icons.star_border,
-                                  color: Color.fromARGB(255, 95, 113, 139),
+                                  color: Color.fromARGB(255,150,123,182),
                                 ),
                                 onPressed: () {
                                   setState(() {
@@ -358,7 +358,7 @@ class _EditPageState extends ConsumerState<EditPage>
             ),
             // NOTE TAB
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(12.0),
               child: TextFormField(
                 controller: noteController,
                 decoration: const InputDecoration(
@@ -376,12 +376,12 @@ class _EditPageState extends ConsumerState<EditPage>
         // TAB 1
       ),
       floatingActionButton: FloatingActionButton(
-        //backgroundColor: Color.fromARGB(255, 218, 229, 235),
+        backgroundColor: Color.fromARGB(255,150,123,182),
         onPressed: () {
           saveBook();
           print('save button pressed');
         },
-        child: const Icon(Icons.save),
+        child: const Icon(Icons.save, color:Colors.white),
       ),
     );
   }

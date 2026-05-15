@@ -1,4 +1,20 @@
-元件	顏色建議
+API資料 推薦列表
+分類篩選 搜尋 排序
+第一優先（一定修）
+controller scope bug
+dispose controller
+tag normalization
+sorting state
+rebuild 範圍
+第二優先
+component 拆分
+provider 結構整理
+search optimization
+第三優先
+theme system
+architecture clean up
+
+顏色建議
 背景色	Color(0xFFFFF8E1)（淡米色）
 卡片色	Color(0xFFFFECB3)（淺黃米）
 文字（標題）	黑色
@@ -15,4 +31,6 @@ Scaffold 背景	Color(0xFFFFF8E1)（淡米色）	紙張質感
 亮藍色Color.fromARGB(255, 217, 227, 255)
 紅色 Color.fromARGB(255, 205, 127, 127)
 藍色 Color.fromARGB(255, 95, 113, 139)
+亮藍灰 LightSlateGrey Color.fromARGB(255, 119, 136, 153)
 oreo 黑色 Color.fromARGB(255, 41, 43, 42)
+薰衣草淡紫 Lavender Color.fromARGB(255,150,123,182)
