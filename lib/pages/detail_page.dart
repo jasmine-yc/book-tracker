@@ -3,11 +3,27 @@ import 'package:book_app/models/book_data.dart';
 import 'dart:io';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:book_app/pages/edit_page.dart';
+// medels
+import '../models/book_status.dart';
 
 class DetailPage extends StatelessWidget {
   final Book book;
+  final statusMap = {'unRead': '未讀', 'reading': '閱讀中', 'finished': '完讀'};
 
-  const DetailPage({super.key, required this.book});
+  DetailPage({super.key, required this.book});
+
+  String _getStatusText(BookStatus status) {
+    switch (status) {
+      case BookStatus.unRead:
+        return '未讀';
+
+      case BookStatus.reading:
+        return '閱讀中';
+
+      case BookStatus.finished:
+        return '完讀';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,11 +37,8 @@ class DetailPage extends StatelessWidget {
           child: Scaffold(
             backgroundColor: Colors.grey[50],
             appBar: AppBar(
-              title: Text(
-                '檢視書籍',
-                style: TextStyle(color: Colors.white70),
-              ),
-              backgroundColor: const Color.fromARGB(255, 150, 123, 182),
+              title: Text('檢視書籍', style: TextStyle(color: Colors.white70)),
+              backgroundColor: const Color.fromARGB(255, 97, 100, 158),
               actions: [
                 IconButton(
                   icon: Icon(Icons.delete),
@@ -192,7 +205,7 @@ class DetailPage extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            '狀態：${book.status}',
+                            '狀態：${_getStatusText(book.status)}',
                             style: TextStyle(fontSize: 18),
                           ),
                         ],
@@ -211,7 +224,7 @@ class DetailPage extends StatelessWidget {
                       //const SizedBox(height: 8),
                       SelectableText(
                         updatedBook.note,
-                        style: TextStyle(fontSize: 18, color: Colors.teal[800]),
+                        style: TextStyle(fontSize: 18, color: Color.fromARGB(255, 97, 100, 158)),
                       ),
                     ],
                   ),
@@ -219,7 +232,7 @@ class DetailPage extends StatelessWidget {
               ],
             ),
             floatingActionButton: FloatingActionButton(
-              backgroundColor: Color.fromARGB(255,150,123,182),
+              backgroundColor: Color.fromARGB(255, 97, 100, 158),
               tooltip: '編輯',
               child: const Icon(Icons.edit, color: Colors.white),
               onPressed: () async {

@@ -8,29 +8,28 @@ import './models/book_status.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 void main() async {
-
   WidgetsFlutterBinding.ensureInitialized();
   Hive.registerAdapter(BookStatusAdapter());
   Hive.registerAdapter(BookAdapter());
   await Hive.openBox<Book>('books');
 
-  runApp (
-    ProviderScope(child: MyApp()),
-  );
-  
+  runApp(ProviderScope(child: MyApp()));
 }
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: '書籍記錄',
-      home:MainPage(),
+      home: MainPage(),
       color: Colors.grey[850],
-      theme:ThemeData(
-        colorSchemeSeed: Color.fromARGB(255,150,123,182),
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
         textTheme: GoogleFonts.notoSerifTcTextTheme(),
-      )
+        useMaterial3: true,
+      ),
     );
   }
 }

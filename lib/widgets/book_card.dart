@@ -19,20 +19,21 @@ class BookCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
       color: book.status == BookStatus.finished
-          ? const Color.fromARGB(255, 242, 237, 237) // 看完
+          ? const Color.fromARGB(255, 237, 237, 242) // 看完
           : const Color.fromARGB(255, 243, 238, 244), // 未讀/閱讀中
       elevation: 2, // 陰影
       shape: const RoundedRectangleBorder(
         // 修改形狀
         side: BorderSide(
           color: Colors.black87, // 邊框顏色
-          width: 1, // 邊框寬度
+          style:BorderStyle.none
+          // width: 1, // 邊框寬度
         ),
         // 修改圓角
         borderRadius: BorderRadius.all(Radius.circular(20)),
       ),
 
-      child: ListTile(
+      child: ListTile(        
         trailing: IconButton(
           onPressed:() async{
             await Navigator.of(context).push(
@@ -40,7 +41,8 @@ class BookCard extends ConsumerWidget {
             );
           },
           icon: Icon(Icons.edit),
-          color: Colors.deepPurple,
+          color: Color.fromARGB(255,97, 100, 158),
+          
         ),
 
         // 前面有一個封面圖
@@ -53,7 +55,7 @@ class BookCard extends ConsumerWidget {
                 backgroundColor: Colors.grey[50],
                 child: Icon(
                   Icons.book,
-                  color: book.status== BookStatus.finished?Color.fromARGB(255, 165, 83, 83):Color.fromARGB(255, 127, 91, 171),
+                  color: book.status== BookStatus.finished?Color.fromARGB(255, 83, 109, 165):Color.fromARGB(255, 127, 91, 171),
                 ),
               ),
         title: Text(
@@ -83,8 +85,8 @@ class BookCard extends ConsumerWidget {
             context: context,
             builder:(context)=>AlertDialog(
               contentPadding: const EdgeInsets.all(20.0),
-              title: Text('確認刪除${book.title}嗎？'),
-              content: const Text('將會永久刪除該書籍的相關紀錄'),
+              title: Text('刪除'),
+              content: Text('確認刪除${book.title}嗎？'),
               actions:[
                 TextButton(
                   child:const Text('刪除'),

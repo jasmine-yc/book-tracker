@@ -86,91 +86,86 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
 
     // -----------------------------------------------------
     return Scaffold(
-      backgroundColor: Colors.grey[50], // 淺灰
+      backgroundColor: Colors.grey[100], // 淺灰
       appBar: AppBar(
         leading: Image.asset("assets/icon/app_icon.jpg"),
         // backgroundColor: Color.fromARGB(255, 176, 196, 222), // LightSteelBlue
         // backgroundColor: Color.fromARGB(255, 61, 93, 133),
-        backgroundColor: Color.fromARGB(255, 150, 123, 182), // 紫羅蘭色
+        backgroundColor: Color.fromARGB(255, 97, 100, 158), // 紫羅蘭色
         centerTitle: true,
         title: const Text(
-          'BOOK TRACKER',
+          'YOUR LIBRARY',
           style: TextStyle(color: Colors.white, letterSpacing: 4),
         ),
       ),
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch, // 撐滿寬度
         children: [
           // 搜尋框
           Padding(
-            padding: EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 0.0),
-            child: TypeAheadField<String>(
-              controller: searchController,
-              suggestionsCallback: (pattern) {
-                final suggestions = <String>{};
-                // 書名 & 作者
-                for (var book in books) {
-                  if (book.title.toLowerCase().contains(
-                    pattern.toLowerCase(),
-                  )) {
-                    suggestions.add(book.title);
-                  }
-                  //
-                  if (book.author.toLowerCase().contains(
-                    pattern.toLowerCase(),
-                  )) {
-                    suggestions.add(book.author);
-                  }
-                }
-                return suggestions.take(10).toList();
-              },
+            padding: const EdgeInsets.fromLTRB(8, 16, 8, 0),
+            child: SearchAnchor(
+              builder: (context, controller) {
+                return SearchBar(
+                  controller: controller,
+                  hintText: '搜尋 (書名/作者)',
+                  leading: const Icon(Icons.search_outlined),
 
-              builder: (context, controller, focusNode) {
-                return TextField(
                   onChanged: (value) {
                     ref.read(searchQueryProvider.notifier).state = value
                         .trim()
                         .toLowerCase();
+
+                    controller.openView();
                   },
-                  controller: controller,
-                  focusNode: focusNode,
-                  decoration: InputDecoration(
-                    hintText: 'Search by book title or author',
-                    // suffixText: '<10字',
-                    filled: true,
-                    fillColor: Colors.white,
-                    prefixIcon: const Icon(Icons.search_outlined),
-                    iconColor: Colors.black,
-                    suffixIcon: IconButton(
-                      icon: const Icon(Icons.cancel),
-                      onPressed: () {
-                        searchController.clear();
-                        ref.read(searchQueryProvider.notifier).state = '';
-                      },
-                    ),
-                    // 邊框
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                      borderSide: BorderSide(
-                        color: const Color.fromARGB(255, 120, 133, 164),
-                      ),
+
+                  backgroundColor: WidgetStateProperty.all(Colors.white),
+
+                  shape: WidgetStateProperty.all(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
                     ),
                   ),
+                  onTap: () {
+                    controller.openView();
+                  },
                 );
               },
-              itemBuilder: (context, suggestion) {
-                return ListTile(
-                  leading: Icon(Icons.search),
-                  title: Text(suggestion),
-                );
-              },
-              onSelected: (suggestion) {
-                searchController.text = suggestion;
-                ref.read(searchQueryProvider.notifier).state = suggestion
-                    .toLowerCase();
+
+              suggestionsBuilder: (context, controller) {
+                final pattern = controller.text.toLowerCase();
+
+                final suggestions = <String>{};
+
+                for (var book in books) {
+                  if (book.title.toLowerCase().contains(pattern)) {
+                    suggestions.add(book.title);
+                  }
+
+                  if (book.author.toLowerCase().contains(pattern)) {
+                    suggestions.add(book.author);
+                  }
+                }
+
+                return suggestions.take(10).map((suggestion) {
+                  return ListTile(
+                    leading: const Icon(Icons.search),
+                    title: Text(suggestion),
+
+                    onTap: () {
+                      controller.closeView(suggestion);
+
+                      searchController.text = suggestion;
+
+                      ref.read(searchQueryProvider.notifier).state = suggestion
+                          .toLowerCase();
+                    },
+                  );
+                }).toList();
               },
             ),
           ),
-
           // 標籤搜尋
           Padding(
             padding: EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 0.0),
@@ -224,48 +219,48 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
               },
             ),
           ),
-
-          // 選擇排列方式
-          Padding(
-            padding: const EdgeInsets.all(8.0),
+          SizedBox(height:16.0),
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                TextButton(
-                  onPressed: () {
-                    showModalBottomSheet(
-                      context: context,
-                      builder: (context) {
-                        return StatefulBuilder(
-                          builder: (context, setModalState) {
-                            return ListView(
-                              children: allTags.map((tag) {
-                                return CheckboxListTile(
-                                  title: Text(tag),
-                                  value: selectedTags.contains(tag),
-                                  onChanged: (selected) {
-                                    setModalState(() {
-                                      if (selected == true) {
-                                        selectedTags.add(tag);
-                                      } else {
-                                        selectedTags.remove(tag);
-                                      }
-                                    });
-                                  },
-                                  controlAffinity:
-                                      ListTileControlAffinity.leading,
-                                );
-                              }).toList(),
-                            );
-                          },
-                        );
-                      },
-                    );
-                  },
-                  child: Text('標籤篩選'),
+                Column(
+                  children: [
+                    Icon(
+                      Icons.menu_book,
+                      size: 40,
+                      color: Color.fromARGB(255, 97, 100, 158),
+                    ),
+                    Text('閱讀目標'),
+                  ],
+                ),
+                Column(
+                  children: [
+                    Icon(
+                      Icons.auto_graph,
+                      size: 40,
+                      color: Color.fromARGB(255, 97, 100, 158),
+                    ),
+                    Text('閱讀進度'),
+                  ],
+                ),
+                Column(
+                  children: [
+                    Icon(
+                      Icons.bookmark,
+                      size: 40,
+                      color: Color.fromARGB(255, 97, 100, 158),
+                    ),
+                    Text('收藏書籍'),
+                  ],
                 ),
               ],
             ),
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.0),
+            child: Divider(),
           ),
 
           // 【卡片】書籍列表區
@@ -304,7 +299,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       ),
       // 新增書本懸浮紐 自動建立空資料
       floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color.fromARGB(255, 150, 123, 182),
+        backgroundColor: const Color.fromARGB(255, 97, 100, 158),
         onPressed: () async {
           // 導航到編輯頁面
           navigateToEditPage(context);
