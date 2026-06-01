@@ -34,3 +34,4 @@ Scaffold 背景	Color(0xFFFFF8E1)（淡米色）	紙張質感
 亮藍灰 LightSlateGrey Color.fromARGB(255, 119, 136, 153)
 oreo 黑色 Color.fromARGB(255, 41, 43, 42)
 薰衣草淡紫 Lavender Color.fromARGB(255,150,123,182)
+奶茶色 Color.fromARGB(255, 171, 126, 91)

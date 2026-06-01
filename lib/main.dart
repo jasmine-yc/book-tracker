@@ -24,9 +24,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: '書籍記錄',
       home: MainPage(),
-      color: Colors.grey[850],
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
+        colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 79, 94, 122)),
         textTheme: GoogleFonts.notoSerifTcTextTheme(),
         useMaterial3: true,
       ),

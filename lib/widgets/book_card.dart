@@ -15,22 +15,34 @@ class BookCard extends ConsumerWidget {
 
   const BookCard({super.key, required this.book});
 
+  String _getStatusText(BookStatus status) {
+    switch (status) {
+      case BookStatus.unRead:
+        return '未讀';
+
+      case BookStatus.reading:
+        return '閱讀中';
+
+      case BookStatus.finished:
+        return '完讀';
+    }
+  }
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
       color: book.status == BookStatus.finished
-          ? const Color.fromARGB(255, 237, 237, 242) // 看完
-          : const Color.fromARGB(255, 243, 238, 244), // 未讀/閱讀中
+          ? Colors.blueGrey[50] // 看完
+          : Colors.lightGreen[50], // 未讀/閱讀中
       elevation: 2, // 陰影
       shape: const RoundedRectangleBorder(
         // 修改形狀
         side: BorderSide(
-          color: Colors.black87, // 邊框顏色
-          style:BorderStyle.none
-          // width: 1, // 邊框寬度
+          color: Color.fromARGB(255, 79, 94, 122), // 邊框顏色
+          style:BorderStyle.solid,
+          width: 1.0, // 邊框寬度
         ),
         // 修改圓角
-        borderRadius: BorderRadius.all(Radius.circular(20)),
+        borderRadius: BorderRadius.all(Radius.circular(30)),
       ),
 
       child: ListTile(        
@@ -41,7 +53,7 @@ class BookCard extends ConsumerWidget {
             );
           },
           icon: Icon(Icons.edit),
-          color: Color.fromARGB(255,97, 100, 158),
+          color: book.status== BookStatus.finished?Color.fromARGB(255, 83, 109, 165):Colors.blueGrey,
           
         ),
 
@@ -49,29 +61,31 @@ class BookCard extends ConsumerWidget {
         leading:
             (book.coverImagePath != null && book.coverImagePath!.isNotEmpty)
             ? CircleAvatar(
+                radius:50,
                 backgroundImage: FileImage(File(book.coverImagePath!)),
               )
             : CircleAvatar(
-                backgroundColor: Colors.grey[50],
+                backgroundColor: book.status== BookStatus.finished?Color.fromARGB(255, 83, 109, 165):Colors.blueGrey,
                 child: Icon(
                   Icons.book,
-                  color: book.status== BookStatus.finished?Color.fromARGB(255, 83, 109, 165):Color.fromARGB(255, 127, 91, 171),
+                  color: Colors.grey[50],
                 ),
               ),
         title: Text(
-          book.status== BookStatus.finished
-          ?'${book.title}[完讀✓]'
-          :'${book.title}[未完]',
+          book.title,
           maxLines:1,
           style: const TextStyle(
-            color: Color.fromARGB(255, 65, 52, 69),
+            // fontSize: 18,
+            color: Color.fromARGB(255, 55, 52, 69),
             fontWeight: FontWeight.bold,
           ),
         ),
-        subtitle: Text(
-          book.author,
-          maxLines:1,
-          style: const TextStyle(color: Colors.black54),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("- 作者：${book.author}", maxLines:1, style: const TextStyle(color: Colors.black54),),
+            Text("- 評分：${book.rate.toString()} / 閱讀狀態：${_getStatusText(book.status)}",maxLines:1, style: const TextStyle(color: Colors.black54)),
+          ],
         ),
         // 點擊進入檢視頁面 帶入書本資料
         onTap: () {
@@ -86,21 +100,21 @@ class BookCard extends ConsumerWidget {
             builder:(context)=>AlertDialog(
               contentPadding: const EdgeInsets.all(20.0),
               title: Text('刪除'),
-              content: Text('確認刪除${book.title}嗎？'),
-              actions:[
-                TextButton(
-                  child:const Text('刪除'),
-                  onPressed:(){
-                    ref.read(bookProvider.notifier).deleteBook(book);
-                    Navigator.of(context).pop();
-                  }           
-                ),
+              content: Text('確認刪除「${book.title}」嗎？'),
+              actions:[            
                 TextButton(
                   child:const Text('取消'),
                   onPressed:(){
                     Navigator.of(context).pop();
                   }           
-                )
+                ),
+                TextButton(
+                  child:Text('刪除', style:TextStyle(color:Colors.red[600])),
+                  onPressed:(){
+                    ref.read(bookProvider.notifier).deleteBook(book);
+                    Navigator.of(context).pop();
+                  }           
+                ),
               ]
             )
           );

@@ -36,7 +36,7 @@ class _MainPageState extends State<MainPage> {
         },
         items: const [
           BottomNavigationBarItem(
-            backgroundColor:Color.fromARGB(255, 97, 100, 158),
+            backgroundColor:Color.fromARGB(255, 79, 94, 122),
             label: 'Home',
             icon:Icon(Icons.home),
           ),

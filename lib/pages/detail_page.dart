@@ -8,9 +8,8 @@ import '../models/book_status.dart';
 
 class DetailPage extends StatelessWidget {
   final Book book;
-  final statusMap = {'unRead': '未讀', 'reading': '閱讀中', 'finished': '完讀'};
 
-  DetailPage({super.key, required this.book});
+  const DetailPage({super.key, required this.book});
 
   String _getStatusText(BookStatus status) {
     switch (status) {
@@ -38,11 +37,11 @@ class DetailPage extends StatelessWidget {
             backgroundColor: Colors.grey[50],
             appBar: AppBar(
               title: Text('檢視書籍', style: TextStyle(color: Colors.white70)),
-              backgroundColor: const Color.fromARGB(255, 97, 100, 158),
+              backgroundColor: const Color.fromARGB(255, 79, 94, 122),
               actions: [
                 IconButton(
                   icon: Icon(Icons.delete),
-                  color: Colors.black,
+                  color: Colors.grey[50],
                   onPressed: () async {
                     showDialog(
                       context: context,
@@ -113,7 +112,7 @@ class DetailPage extends StatelessWidget {
                             : null,
                       ),
                       const SizedBox(height: 12),
-                      Text(
+                      SelectableText(
                         updatedBook.title,
                         style: const TextStyle(
                           fontSize: 25,
@@ -124,12 +123,12 @@ class DetailPage extends StatelessWidget {
                       Row(
                         children: [
                           Icon(Icons.portrait),
-                          const Text(
+                          const SelectableText(
                             "作者：",
                             maxLines: 1,
                             style: TextStyle(fontSize: 18),
                           ),
-                          Text(
+                          SelectableText(
                             updatedBook.author,
                             maxLines: 1,
                             style: const TextStyle(
@@ -174,12 +173,12 @@ class DetailPage extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 8),
-                      Text(
+                      SelectableText(
                         "原始儲存時間：${updatedBook.saveDate}",
                         style: const TextStyle(fontSize: 18),
                       ),
                       const SizedBox(height: 8),
-                      Text(
+                      SelectableText(
                         "最新儲存時間：${updatedBook.saveDate}",
                         style: const TextStyle(fontSize: 18),
                       ),
@@ -188,7 +187,7 @@ class DetailPage extends StatelessWidget {
                         children: [
                           const Text("評分：", style: TextStyle(fontSize: 18)),
                           updatedBook.rate != null
-                              ? Text(
+                              ? SelectableText(
                                   "${updatedBook.rate}",
                                   style: const TextStyle(
                                     fontSize: 18,
@@ -204,7 +203,7 @@ class DetailPage extends StatelessWidget {
                       const SizedBox(height: 8),
                       Row(
                         children: [
-                          Text(
+                          SelectableText(
                             '狀態：${_getStatusText(book.status)}',
                             style: TextStyle(fontSize: 18),
                           ),
@@ -215,24 +214,26 @@ class DetailPage extends StatelessWidget {
                 ),
 
                 // TAB 2：書評
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      //const Text("筆記 >>", style: TextStyle(fontSize: 18)),
-                      //const SizedBox(height: 8),
-                      SelectableText(
-                        updatedBook.note,
-                        style: TextStyle(fontSize: 18, color: Color.fromARGB(255, 97, 100, 158)),
-                      ),
-                    ],
+                SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text("筆記", style: TextStyle(fontSize: 18, color: Colors.black87)),
+                        const Divider(),
+                        SelectableText(
+                          updatedBook.note,
+                          style: TextStyle(fontSize: 18, color: Color.fromARGB(255, 79, 94, 122)),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
             ),
             floatingActionButton: FloatingActionButton(
-              backgroundColor: Color.fromARGB(255, 97, 100, 158),
+              backgroundColor: Color.fromARGB(255, 79, 94, 122),
               tooltip: '編輯',
               child: const Icon(Icons.edit, color: Colors.white),
               onPressed: () async {

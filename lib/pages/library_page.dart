@@ -1,4 +1,6 @@
 // packages
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,6 +27,67 @@ class LibraryPage extends ConsumerStatefulWidget {
 
 class _LibraryPageState extends ConsumerState<LibraryPage> {
   late final TextEditingController searchController;
+  Timer? _debounce; // 搜尋框更新
+
+  Widget _highlightText(
+    String text,
+    String pattern, {
+    bool isSubtitle = false,
+  }) {
+    if (pattern.isEmpty) {
+      return Text(
+        text,
+        style: isSubtitle ? const TextStyle(fontSize: 13) : null,
+      );
+    }
+
+    final lowerText = text.toLowerCase();
+    final matches = <Match>[];
+    int start = 0;
+
+    while ((start = lowerText.indexOf(pattern, start)) != -1) {
+      matches.add(Match(start, start + pattern.length));
+      start += pattern.length;
+    }
+
+    if (matches.isEmpty) {
+      return Text(
+        text,
+        style: isSubtitle ? const TextStyle(fontSize: 13) : null,
+      );
+    }
+
+    final spans = <TextSpan>[];
+    int lastEnd = 0;
+
+    for (final match in matches) {
+      if (match.start > lastEnd) {
+        spans.add(TextSpan(text: text.substring(lastEnd, match.start)));
+      }
+      spans.add(
+        TextSpan(
+          text: text.substring(match.start, match.end),
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.blue,
+            backgroundColor: Color(0xFFE3F2FD),
+          ),
+        ),
+      );
+      lastEnd = match.end;
+    }
+
+    if (lastEnd < text.length) {
+      spans.add(TextSpan(text: text.substring(lastEnd)));
+    }
+
+    return RichText(
+      text: TextSpan(
+        children: spans,
+        style: TextStyle(color: Colors.black87, fontSize: isSubtitle ? 13 : 16),
+      ),
+    );
+  }
 
   Future<void> navigateToEditPage(BuildContext context, {Book? book}) async {
     final result = await Navigator.push<Map<String, dynamic>>(
@@ -69,6 +132,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
 
   @override
   void dispose() {
+    _debounce?.cancel();
     searchController.dispose();
     super.dispose();
   }
@@ -91,7 +155,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
         leading: Image.asset("assets/icon/app_icon.jpg"),
         // backgroundColor: Color.fromARGB(255, 176, 196, 222), // LightSteelBlue
         // backgroundColor: Color.fromARGB(255, 61, 93, 133),
-        backgroundColor: Color.fromARGB(255, 97, 100, 158), // 紫羅蘭色
+        backgroundColor: Color.fromARGB(255, 79, 94, 122), // 標準藍
         centerTitle: true,
         title: const Text(
           'YOUR LIBRARY',
@@ -105,65 +169,97 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           // 搜尋框
           Padding(
             padding: const EdgeInsets.fromLTRB(8, 16, 8, 0),
-            child: SearchAnchor(
-              builder: (context, controller) {
-                return SearchBar(
+            child: TypeAheadField<Book>(
+              controller: searchController,
+              suggestionsCallback: (pattern) {
+                if (pattern.isEmpty) return const [];
+
+                final lowerPattern = pattern.toLowerCase().trim();
+                final books = ref.watch(bookProvider); // 用 set 避免重複
+
+                // 過濾並排序
+                return books
+                    .where(
+                      (book) =>
+                          book.title.toLowerCase().contains(lowerPattern) ||
+                          book.author.toLowerCase().contains(lowerPattern),
+                    )
+                    .toList()
+                  ..sort((a, b) {
+                    // 標題>作者
+                    final aTitleMatch = a.title.toLowerCase().contains(
+                      lowerPattern,
+                    );
+                    final bTitleMatch = b.title.toLowerCase().contains(
+                      lowerPattern,
+                    );
+                    if (aTitleMatch != bTitleMatch) return aTitleMatch ? -1 : 1;
+                    return 0;
+                  });
+              },
+              builder: (context, controller, focusNode) {
+                return TextField(
                   controller: controller,
-                  hintText: '搜尋 (書名/作者)',
-                  leading: const Icon(Icons.search_outlined),
-
-                  onChanged: (value) {
-                    ref.read(searchQueryProvider.notifier).state = value
-                        .trim()
-                        .toLowerCase();
-
-                    controller.openView();
-                  },
-
-                  backgroundColor: WidgetStateProperty.all(Colors.white),
-
-                  shape: WidgetStateProperty.all(
-                    RoundedRectangleBorder(
+                  focusNode: focusNode,
+                  decoration: InputDecoration(
+                    hintText: '搜尋（書名/作者）',
+                    prefixIcon: const Icon(Icons.search_outlined),
+                    border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    suffixIcon: controller.text.isNotEmpty
+                    ?IconButton(
+                      icon: Icon(Icons.cancel),
+                      onPressed: () {
+                        controller.clear();
+                        ref.read(searchQueryProvider.notifier).state = '';
+
+                        if (_debounce?.isActive ?? false) {
+                          _debounce!.cancel();
+                        }
+                        FocusScope.of(context).unfocus();
+                        setState(() {});
+                      },
+                    )
+                    :null,
                   ),
-                  onTap: () {
-                    controller.openView();
+                  onChanged: (value) {
+                    // debounce
+                    if (_debounce?.isActive ?? false) _debounce!.cancel();
+                    _debounce = Timer(const Duration(milliseconds: 250), () {
+                      ref.read(searchQueryProvider.notifier).state = value
+                          .trim()
+                          .toLowerCase();
+                    });
                   },
                 );
               },
+              itemBuilder: (context, Book book) {
+                final pattern = searchController.text.toLowerCase().trim();
+                final title = book.title;
+                final author = book.author;
 
-              suggestionsBuilder: (context, controller) {
-                final pattern = controller.text.toLowerCase();
-
-                final suggestions = <String>{};
-
-                for (var book in books) {
-                  if (book.title.toLowerCase().contains(pattern)) {
-                    suggestions.add(book.title);
-                  }
-
-                  if (book.author.toLowerCase().contains(pattern)) {
-                    suggestions.add(book.author);
-                  }
-                }
-
-                return suggestions.take(10).map((suggestion) {
-                  return ListTile(
-                    leading: const Icon(Icons.search),
-                    title: Text(suggestion),
-
-                    onTap: () {
-                      controller.closeView(suggestion);
-
-                      searchController.text = suggestion;
-
-                      ref.read(searchQueryProvider.notifier).state = suggestion
-                          .toLowerCase();
-                    },
-                  );
-                }).toList();
+                return ListTile(
+                  leading: const Icon(Icons.search, color: Colors.blueGrey),
+                  title: _highlightText(title, pattern),
+                  subtitle: _highlightText(author, pattern, isSubtitle: true),
+                  trailing: Text(
+                    "書名 - 作者",
+                    style: TextStyle(fontSize: 12, color: Colors.grey[400]),
+                  ),
+                );
               },
+              onSelected: (Book book) {
+                searchController.text = book.title;
+                ref.read(searchQueryProvider.notifier).state = book.title
+                    .toLowerCase();
+
+                FocusScope.of(context).unfocus(); // 關閉鍵盤
+              },
+              hideOnEmpty: true,
+              hideOnLoading: true,
             ),
           ),
           // 標籤搜尋
@@ -219,7 +315,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
               },
             ),
           ),
-          SizedBox(height:16.0),
+          SizedBox(height: 16.0),
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Row(
@@ -230,7 +326,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                     Icon(
                       Icons.menu_book,
                       size: 40,
-                      color: Color.fromARGB(255, 97, 100, 158),
+                      color: Color.fromARGB(255, 79, 94, 122),
                     ),
                     Text('閱讀目標'),
                   ],
@@ -240,7 +336,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                     Icon(
                       Icons.auto_graph,
                       size: 40,
-                      color: Color.fromARGB(255, 97, 100, 158),
+                      color: Color.fromARGB(255, 79, 94, 122),
                     ),
                     Text('閱讀進度'),
                   ],
@@ -250,7 +346,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                     Icon(
                       Icons.bookmark,
                       size: 40,
-                      color: Color.fromARGB(255, 97, 100, 158),
+                      color: Color.fromARGB(255, 79, 94, 122),
                     ),
                     Text('收藏書籍'),
                   ],
@@ -299,7 +395,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       ),
       // 新增書本懸浮紐 自動建立空資料
       floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color.fromARGB(255, 97, 100, 158),
+        backgroundColor: const Color.fromARGB(255, 79, 94, 122),
         onPressed: () async {
           // 導航到編輯頁面
           navigateToEditPage(context);
@@ -308,4 +404,10 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       ),
     );
   }
+}
+
+class Match {
+  final int start;
+  final int end;
+  Match(this.start, this.end);
 }
